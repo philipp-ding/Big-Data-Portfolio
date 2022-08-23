@@ -1,5 +1,8 @@
 # Big-Data-Portfolio
 
+navigate in the right folder via
+cd container_test
+
 to build the container run:
 docker build -t pysparktest .
 
