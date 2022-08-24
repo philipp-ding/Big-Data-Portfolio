@@ -1,0 +1,28 @@
+.button{
+    cursor: pointer;
+    border: 1px solid #1a202c;
+    padding: 8px;
+    min-width:64px;
+
+    background:#ffffff ;
+    transition: all 0.1s ease-in;
+    margin-bottom: auto;
+    border-radius: 10px;
+    
+
+}
+.button:hover{
+    background: #1a202c;
+    color: #ffffff;
+
+}
+.grid-cols-3{
+
+    background: #f3f3f3;
+    color: #161616;
+    width: 50%;
+    margin:auto;
+    margin-bottom: 2%;
+    border-radius: 10px;
+    
+}

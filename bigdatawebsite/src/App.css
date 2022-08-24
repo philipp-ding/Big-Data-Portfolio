@@ -1,0 +1,61 @@
+.App {
+  text-align: center;
+  color: #383838;
+  background-color: crimson;
+  height: 100vh;
+}
+
+.App-header {
+  background-color: #7fc0b2;
+  
+  min-width: none;
+  font-size: 200%;
+  color:#afc0b2;
+  text-align: auto;
+}
+
+.App-link {
+  color: #ffffff;
+
+}
+
+.Header_Box{
+  display:flex;
+  flex-direction: row;
+  align-items:center;
+  justify-content:center;
+  width: 100%;
+  min-height: 50px;
+}
+.Inner_Box{
+  height:50px;
+  width: 100%;
+  
+}
+.Headline{
+  color:#ffffff;
+  text-align: center;
+  margin-top: -1%;  
+  margin-left: 0%;
+  
+  
+}
+
+
+
+.StartingPage{
+  color:#ffffff;
+  text-decoration: none;
+  text-align: left;
+  margin-right: 2%;
+  margin-left: 2%;
+  
+
+}
+.HomePage{
+
+  color:#505050;
+  text-decoration: none;
+  margin-right: 2%;
+  text-align: left;
+}
