@@ -1,5 +1,7 @@
 # Big-Data-Portfolio
 
+start docker desktop and make sure your docker engine is running
+
 navigate in the right folder via
 cd container_test
 
