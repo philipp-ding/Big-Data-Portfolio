@@ -12,7 +12,24 @@ const HomePage = () => {
   console.log(messages);
 return (
 <>
+  <header className='Genres'>
+    <div className='TopGenres'>
+      <h5> Top 10 Genres according to twitter</h5>
+    </div>
+    <div className='AllGenres'>
+      <h5> All Popular Genres according to twitter</h5>
+    </div>
+    <div className = "PageInfo">
+      <h5 className="ApplicationInfo"> 
+      Server: 
+      Date:
+      Servers Used: 
+      Cashed Results:
+      </h5>
+    </div>
+  </header>
   
+
   <ENTRY_LIST
     messages={messages}
     removeEntry={removeEntryFromState}
