@@ -1,0 +1,283 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: popular-slides-spark-hadoop-conf
+data:
+  # https://stackoverflow.com/questions/38482779/spark-submit-yarn-mode-hadoop-conf-dir-contents/38483127
+  core-site.xml: |
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+         <property>
+                 <name>fs.default.name</name>
+                 <value>hdfs://master:9000</value>
+          </property>
+         <property> 
+                 <name>hadoop.security.authentication</name>
+                 <value>kerberos</value> <!-- A value of "simple" would disable security. -->
+         </property>
+         <property>
+                 <name>hadoop.security.authorization</name>
+                 <value>true</value>
+         </property>
+    </configuration>
+
+  hdfs-site.xml: |
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+        <property>
+                <name>dfs.namenode.name.dir</name>
+                <value>/data/name-node</value>
+        </property>
+        <property>
+                <name>dfs.datanode.data.dir</name>
+                <value>/data/data-node</value>
+        </property>
+        <property>
+                <name>dfs.replication</name>
+                <value>1</value>
+        </property>
+        <property>
+                <name>hadoop.tmp.dir</name>
+                <value>/hadoop-hdfs/cache/ubuntu</value>
+        </property>
+        <property>
+                <name>dfs.namenode.rpc-bind-host</name>
+                <value>0.0.0.0</value>
+        </property>
+        <property>
+                <name>dfs.namenode.servicerpc-bind-host</name>
+                <value>0.0.0.0</value>
+        </property>
+        <property>
+                <name>dfs.client.use.datanode.hostname</name>
+                <value>true</value>
+                <description>Whether clients should use datanode hostnames when connecting to datanodes</description>
+        </property>
+        <property>
+           <name>dfs.datanode.use.datanode.hostname</name>
+                 <value>true</value>
+                 <description>Whether datanodes should use datanode hostnames when connecting to other d</description>
+        </property>
+        <!-- General HDFS security config -->
+        <property>
+                <name>dfs.block.access.token.enable</name>
+                <value>true</value>
+        </property>
+        <!-- NameNode security config -->
+        <property>
+                  <name>dfs.namenode.keytab.file</name>
+                  <value>/home/ubuntu/keytabs/hdfs-master.keytab</value> <!-- path to the HDFS keytab -->
+        </property>
+        <property>
+                <name>dfs.namenode.kerberos.principal</name>
+                  <value>hdfs/_HOST@HADOOP.COM</value>
+        </property>
+        <property>                <name>dfs.namenode.kerberos.internal.spnego.principal</name>
+                  <value>HTTP/_HOST@HADOOP.COM</value>
+        </property>
+        <!-- Secondary NameNode security config -->
+        <property>                 <name>dfs.secondary.namenode.keytab.file</name>
+                  <value>/home/ubuntu/keytabs/hdfs-master.keytab</value> <!-- path to the HDFS keytab -->
+        </property>
+        <property>                <name>dfs.secondary.namenode.kerberos.principal</name>
+                  <value>hdfs/_HOST@HADOOP.COM</value>
+        </property>
+        <property>               <name>dfs.secondary.namenode.kerberos.internal.spnego.principal</name>
+                  <value>HTTP/_HOST@HADOOP.COM</value>
+        </property>
+        <!-- DataNode security config -->
+        <property>
+                  <name>dfs.datanode.data.dir.perm</name>
+                  <value>700</value>
+        </property>
+        <property>
+                  <name>dfs.datanode.address</name>
+                  <value>0.0.0.0:1004</value>
+        </property>
+        <property>
+                  <name>dfs.datanode.http.address</name>
+                  <value>0.0.0.0:1006</value>
+        </property>
+        <property>
+                  <name>dfs.datanode.keytab.file</name>
+                  <value>/home/ubuntu/keytabs/worker.keytab</value> <!-- path to the HDFS keytab -->
+        </property>
+        <property>
+                <name>dfs.datanode.kerberos.principal</name>    
+            <value>root@HADOOP.COM</value>
+        </property>
+        <!-- Web Authentication config -->
+        <property>          <name>dfs.web.authentication.kerberos.principal</name>
+                  <value>HTTP/_HOST@HADOOP.COM</value>
+         </property>
+    </configuration>
+
+  # # check if this is required at all
+  # mapred-site.xml: |
+  #   <?xml version="1.0"?>
+  #   <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+  #   <configuration>
+  #     <property>
+  #       <name>mapreduce.framework.name</name>
+  #       <value>yarn</value>
+  #     </property>
+  #     <property>
+  #       <name>mapreduce.jobhistory.address</name>
+  #       <value>my-hadoop-cluster-hadoop-yarn-rm-0.my-hadoop-cluster-hadoop-yarn-rm.default.svc.cluster.local:10020</value>
+  #     </property>
+  #     <property>
+  #       <name>mapreduce.jobhistory.webapp.address</name>
+  #       <value>my-hadoop-cluster-hadoop-yarn-rm-0.my-hadoop-cluster-hadoop-yarn-rm.default.svc.cluster.local:19888</value>
+  #     </property>
+  #   </configuration>
+
+  yarn-site.xml: |
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+    <!-- Site specific YARN configuration properties -->
+        <property>
+                <name>yarn.resourcemanager.hostname</name>
+                <value>master</value>
+        </property>
+        <property>
+                <name>yarn.resourcemanager.address</name>
+                <value>master:8032</value>
+        </property>
+        <property>
+                <name>yarn.resourcemanager.scheduler.address</name>
+                <value>master:8030</value>
+        </property>
+        <property>
+                <name>yarn.resourcemanager.resource-tracker.address</name>
+                <value>master:8031</value>
+        </property>
+        <property>
+        <name>yarn.log-aggregation-enable</name>
+                <value>true</value>
+        </property>
+        <property>
+                <name>yarn.dispatcher.exit-on-error</name>
+                <value>true</value>
+        </property>
+        <property>
+                <description>List of directories to store localized files in.
+                </description>
+                <name>yarn.nodemanager.local-dirs</name>
+                 <value>/hadoop-yarn/cache/ubuntu/nm-local-dir</value>
+        </property>
+        <property>
+                <description>Where to store container logs.</description>
+                <name>yarn.nodemanager.log-dirs</name>
+                <value>/var/log/hadoop-yarn/containers</value>
+        </property>
+        <property>
+                <description>Where to aggregate logs to.</description>
+                <name>yarn.nodemanager.remote-app-log-dir</name>
+                <value>/var/log/hadoop-yarn/apps</value>
+        </property>
+        <property>
+                <description>Classpath for typical applications.</description>
+                <name>yarn.application.classpath</name>
+                <value>
+                        $HADOOP_CONF_DIR,
+                        /hadoop/*,/hadoop/lib/*,
+                        $HADOOP_COMMON_HOME/*,$HADOOP_COMMON_HOME/lib/*,
+                        $HADOOP_HDFS_HOME/*,$HADOOP_HDFS_HOME/lib/*,
+                        $HADOOP_YARN_HOME/*,$HADOOP_YARN_HOME/lib/*
+               </value>
+        </property>
+        <property>
+                <name>yarn.scheduler.minimum-allocation-mb</name>
+                <name>1536</name>
+        </property>
+        <property>
+                <name>yarn.scheduler.maximum-allocation-mb</name>
+                <value>4608</value>
+        </property>
+        <property>
+                <name>yarn.nodemanager.resource.memory-mb</name>
+                <value>4608</value>
+        </property>
+        <property>
+                <name>yarn.app.mapreduce.am.resource.mb</name>
+                <value>3072</value>
+        </property>
+        <property>
+                <name>yarn.app.mapreduce.am.command-opts</name>
+                <value>-Xmx2457m</value>
+        </property>
+        <property>
+                <name>yarn.webapp.ui2.enable</name>
+                <value>true</value>
+        </property>
+        <!-- resource manager secure configuration info -->
+        <property>
+                 <name>yarn.resourcemanager.principal</name>
+                 <value>yarn/_HOST@HADOOP.COM</value>
+        </property>
+
+
+        <property>
+                 <name>yarn.resourcemanager.keytab</name>
+                 <value>/home/ubuntu/keytabs/yarn-worker.keytab</value>
+        </property>
+        <!-- remember the principal for the node manager is the principal for the host this yarn-site.xml file is on -->
+        <!-- these (next four) need only be set on node manager nodes -->
+        <property>
+                 <name>yarn.nodemanager.principal</name>
+                 <value>yarn/_HOST@HADOOP.COM</value>
+        </property>
+        <property>
+                 <name>yarn.nodemanager.keytab</name>
+                 <value>/home/ubuntu/keytabs/yarn-worker.keytab</value>
+        </property>
+        <property>
+                 <name>yarn.nodemanager.container-executor.class</name>
+                 <value>org.apache.hadoop.yarn.server.nodemanager.LinuxContainerExecutor</value>
+        </property>
+        <property>
+                 <name>yarn.nodemanager.linux-container-executor.group</name>
+                 <value>yarn</value>
+        </property>
+    </configuration>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: popular-slides-spark
+  labels:
+    app: popular-slides-spark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: popular-slides-spark
+  template:
+    metadata:
+      labels:
+        app: popular-slides-spark
+    spec:
+      containers:
+        - name: popular-slides-spark
+          image: farberg/popular-slides-spark
+          # Mount the volume that has been populated by the init container
+          env:
+            - name: HADOOP_CONF_DIR
+              value: "/hadoop-config/"
+            - name: HADOOP_USER_NAME
+              value: "root"
+            - name: HADOOP_JAAS_DEBUG
+              value: "true"
+
+          volumeMounts:
+            - name: hadoop-conf-volume
+              mountPath: /hadoop-config
+      volumes:
+        - name: hadoop-conf-volume
+          configMap:
+            name: popular-slides-spark-hadoop-conf
