@@ -16,3 +16,8 @@ kubectl port-forward service/my-super-app-service 8080:8080
 2. skaffold
 
 # Error handling
+nginx error: https://stackoverflow.com/questions/61616203/nginx-ingress-controller-failed-calling-webhook
+
+Handling: 
+1. kubectl get validatingwebhookconfigurations
+2. kubectl delete validatingwebhookconfigurations [configuration-name]
