@@ -1,0 +1,22 @@
+apiVersion: skaffold/v2beta27
+kind: Config
+build:
+  artifacts:
+    - image: my-super-web-app
+      context: .
+
+deploy:
+  kubectl:
+    manifests:
+      - ./server/01-mariadb-deployment.yaml
+      - ./server/02-k8s-mariadb-service.yaml
+      - ./server/03-memcached-deployment-and-service.yaml
+      - ./server/04-app-deployment-skaffold.yaml
+      - ./server/04-app-service-and-ingress.yaml
+
+# portForward:
+# - resourceType: deployment
+#   resourceName: my-super-app-service
+#   namespace: service
+#   port: 8080
+#   localPort: 8080

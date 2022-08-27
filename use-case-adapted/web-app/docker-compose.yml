@@ -1,0 +1,56 @@
+# Begin: MariaDB
+version: "3.9"
+
+services:
+  # MariaDB service
+  db:
+    image: mariadb
+    environment:
+      # Set username/password
+      MARIADB_ROOT_PASSWORD: mysecretpw
+      MARIADB_DATABASE: sportsdb
+    volumes:
+      # Populate DB with data
+      - ./mariadb-data.sql:/docker-entrypoint-initdb.d/mariadb-data.sql
+  # End: MariaDB
+
+  # Begin: Memcached
+  # Memcached
+  memcached:
+    image: memcached:latest
+    ports: 
+      - "11211:11211"
+    deploy:
+      replicas: 1
+  # End: Memcached
+
+  # Begin: App
+  # Your application
+  web:
+    build: app/
+    deploy:
+      replicas: 2
+    links:
+      - db
+      - memcached
+    # Determines startup sequence
+    depends_on:
+      - db
+      - memcached
+  # End: App
+
+  # Begin: Nginx
+  # Nginx reverse proxy
+  loadbalancer:
+    image: nginx:alpine
+    ports:
+      - "8080:8080"
+    # Configuration file
+    volumes:
+      - ./nginx-load-balance.conf:/etc/nginx/nginx.conf:ro
+    links:
+      - web
+    # Determines startup sequence
+    depends_on:
+      - web
+  # End: Nginx
