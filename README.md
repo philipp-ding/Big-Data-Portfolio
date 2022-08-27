@@ -17,3 +17,5 @@ kubectl apply -f pod-mysql_v3.yaml
 kubectl exec -ti mariadb-deployment-f9c5768f8-pqsfn -- mysql -u root --password=mysecretpw sportsdb
 
 => Select \* from missions;
+
+cls
