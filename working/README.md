@@ -1,23 +1,23 @@
-# starten der App: (innerhalb des Ordners der skaffold.yaml enthält)
+### starten der App: (innerhalb des Ordners der skaffold.yaml enthält)
 
-skaffold dev
+```skaffold dev```
 
-# Alternative: skaffold run für production --> Code changes werden nicht automatisch erneuert
+Alternative: 
+- skaffold run für production --> Code changes werden nicht automatisch erneuert
+- skaffold debug
 
-# skaffold debug
+### port forwarding: Open new cmd and type
 
-# port forwarding: Open new cmd and type
+```kubectl port-forward service/my-super-app-service 8080:8080```
 
-kubectl port-forward service/my-super-app-service 8080:8080
-
-# Clean-Up
+### Clean-Up
 
 1. Ctrl + C
-2. skaffold
+2. ```skaffold delete```
 
-# Error handling
+### Error handling
 nginx error: https://stackoverflow.com/questions/61616203/nginx-ingress-controller-failed-calling-webhook
 
 Handling: 
-1. kubectl get validatingwebhookconfigurations
-2. kubectl delete validatingwebhookconfigurations [configuration-name]
+1. ```kubectl get validatingwebhookconfigurations```
+2. ```kubectl delete validatingwebhookconfigurations [configuration-name]```
