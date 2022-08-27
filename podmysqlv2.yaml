@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-deployment-init-configmap
+data:
+  mariadb-init.sql: |
+    CREATE TABLE `tweets` (
+      `author_id` VARCHAR(300) NOT NULL,
+      `tweet_id` VARCHAR(300) NOT NULL,
+      `source` VARCHAR(300),
+      `created_at` datetime,
+      `description`  VARCHAR(500000),
+      PRIMARY KEY (`author_id`,`tweet_id`)
+    );
+
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('954138817879035911',	'1560255576482906113',	'TweetDeck',	2022-08-18T13:21:32.000Z,	'Whatever you do, do not use a stardew valley');
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('972909524',	'1560252591044542465',	'Twitter for iPhone',	2022-08-18T13:09:40.000Z,	'actually hey @Michael5SOS play stardew valley');
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('1544007163982610434',	'1560252061886849024',	'Twitter Web App',	2022-08-18T13:07:34.000Z,	'i dont trust stardew valley gunther but im');
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('1456266659669282832',	'1560251833523765249',	'Twitter for iPhone',	2022-08-18T13:06:39.000Z,	'hi beautiful people \nI wanna find some more');
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('4759294249',	'1560250488729358336',	'Twitter for Android',	2022-08-18T13:01:19.000Z,	'Marrying Harvey on Stardew Valley for that');
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deployment
+  labels:
+    app: my-mariadb-deployment
+spec:
+  # A single mariadb instance
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-mariadb
+  template:
+    metadata:
+      labels:
+        app: my-mariadb
+    spec:
+      # This is an excerpt of deployment.spec.template.spec
+      volumes:
+        - name: init-volume
+          configMap:
+            name: mariadb-deployment-init-configmap
+      containers:
+        - name: my-mariadb
+          image: mariadb
+          volumeMounts:
+            - name: init-volume
+              mountPath: /docker-entrypoint-initdb.d/
+          # Set required environment variables to initialize the container
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: "mysecretpw"
+            - name: MARIADB_DATABASE
+              value: "sportsdb"
+          # Mount the volume that has been populated by the init container
+          ports:
+            - containerPort: 3306
+
+          startupProbe: # 60*10s -> 10 min
+            tcpSocket:
+              port: 3306
+            failureThreshold: 60
+            periodSeconds: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            periodSeconds: 10
