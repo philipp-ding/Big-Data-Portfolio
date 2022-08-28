@@ -56,7 +56,7 @@ async function getFromCache(key) {
 //Get data from database
 async function getFromDatabase(userid) {
 	let connection
-	let query = 'SELECT birth_date from persons WHERE person_key = ? LIMIT 1';
+	let query = 'SELECT * from tweets LIMIT 5';
 
 	try {
 		connection = await pool.getConnection()
@@ -66,7 +66,7 @@ async function getFromDatabase(userid) {
 
 		if (row) {
 			console.log("Query result = ", row)
-			return row["birth_date"];
+			return row["author_id"];
 		} else {
 			return null;
 		}
@@ -79,7 +79,7 @@ async function getFromDatabase(userid) {
 
 //Send HTML response to client
 function send_response(response, data) {
-	response.send(`<h1>Hello k8s</h1> 
+	response.send(`<h1>Hello k8s</h1>
 			<ul>
 				<li>Host ${os.hostname()}</li>
 				<li>Date: ${new Date()}</li>
@@ -90,14 +90,14 @@ function send_response(response, data) {
 
 // Redirect / to person with ID l.mlb.com - p.7491
 app.get('/', function (request, response) {
-	response.writeHead(302, { 'Location': 'person/l.mlb.com-p.7491' })
+	response.writeHead(302, { 'Location': 'person/1456266659669282832' })
 	response.end();
 })
 
 // Get data about a single person
 app.getAsync('/person/:id', async function (request, response) {
 	let userid = request.params["id"]
-	let key = 'user_' + userid
+	let key =  userid
 	let cachedata = await getFromCache(key)
 
 
@@ -106,12 +106,13 @@ app.getAsync('/person/:id', async function (request, response) {
 		send_response(response, cachedata + " (cache hit)");
 	} else {
 		console.log(`Cache miss for key=${key}, querying database`)
-		let data = await getFromDatabase(userid)
+		let data= await getFromDatabase(userid)
 		if (data) {
 			console.log(`Got data=${data}, storing in cache`)
+			//console.log(`Got tweet=${description}, storing in cache`)
 			if (memcached)
 				await memcached.set(key, data, 30 /* seconds */);
-			send_response(response, data + " (cache miss)");
+			send_response(response, data + " (cache miss) ");
 		} else {
 			send_response(response, "No data found");
 		}
