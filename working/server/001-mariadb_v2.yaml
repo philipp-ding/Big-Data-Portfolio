@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-deployment-init-configmap
+data:
+  mariadb-init.sql: |
+    CREATE TABLE `missions` (
+      `mission` VARCHAR(30) NOT NULL,
+      `description`  VARCHAR(5000),
+      `heading` VARCHAR(1000),
+      PRIMARY KEY (`mission`)
+    );
+
+    CREATE TABLE `tweets` (
+      `author_id` VARCHAR(30) NOT NULL,
+      `tweet_id` VARCHAR(30) NOT NULL,
+      `source` VARCHAR(30),
+      `created_at` datetime,
+      `description`  VARCHAR(5000),
+      PRIMARY KEY (`author_id`, `tweet_id`)
+    );
+
+    CREATE TABLE `popular_tweets` (
+      `tweet` VARCHAR(30) NOT NULL,
+      `count` BIGINT,
+       PRIMARY KEY (`tweet`)
+    );
+
+    INSERT INTO missions (mission, description, heading) VALUES ('sts-0', 'Esse sunt anim nulla nulla id. Mollit excepteur dolor duis mollit nisi proident ut reprehenderit excepteur nulla duis. Ea dolore aliqua Lorem aliquip exercitation labore. In aute duis nulla et deserunt exercitation. Excepteur in Lorem veniam est aliqua irure.\nAmet sit id enim sit ea non laboris consectetur. Adipisicing ex fugiat Lorem sint officia nostrud qui officia esse irure duis. Exercitation tempor Lorem ea ullamco pariatur occaecat nisi cillum esse. Eiusmod adipisicing non exercitation consequat.\nDuis labore enim Lorem duis elit officia non. Eiusmod dolor irure reprehenderit aliqua et non labore deserunt magna ad Lorem labore. In nulla adipisicing duis labore non labore proident officia labore aute consequat anim. Aute minim dolor dolor enim reprehenderit eu consequat ea ex mollit aliqua. Aliquip excepteur Lorem exercitation ut.\nLorem nulla ea aute consequat esse. Ad labore non dolore nulla pariatur aliqua aliqua consequat qui nisi consectetur pariatur ipsum. Sunt ut aliquip ut eu incididunt est nulla aliqua nostrud. Nostrud velit elit tempor quis occaecat sunt ullamco incididunt ipsum ipsum. Laborum in ipsum qui ex eu culpa aliqua incididunt in labore ipsum tempor magna. Elit nulla qui labore adipisicing duis. Laborum anim veniam quis mollit aliquip quis commodo anim eu.\nVeniam esse incididunt et nulla proident eu adipisicing laboris sit. Pariatur proident ut fugiat cillum excepteur elit sunt eiusmod eiusmod. In commodo irure consectetur sint ullamco. Eu ea sit ad aliqua anim laborum tempor esse eiusmod culpa ut tempor adipisicing sit. Ad cupidatat aliqua fugiat consequat quis voluptate incididunt amet aliquip pariatur sunt est ad reprehenderit. Sit tempor nisi magna esse deserunt deserunt anim non incididunt enim incididunt cupidatat ut. Deserunt cupidatat deserunt culpa aliqua.', 'Culpa adipisicing veniam non nisi.');
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('954138817879035911',	'1560255576482906113',	'TweetDeck',	'2022-08-18 13:21:32',	'Whatever you do, do not use a stardew valley');
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('972909524',	'1560252591044542465',	'Twitter for iPhone',	'2022-08-18T13:09:40',	'actually hey @Michael5SOS play stardew valley');
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('1544007163982610434',	'1560252061886849024',	'Twitter Web App',	'2022-08-18T13:07:34',	'i dont trust stardew valley gunther but im');
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('1456266659669282832',	'1560251833523765249',	'Twitter for iPhone',	'2022-08-18 13:06:39',	'hi beautiful people \nI wanna find some more');
+    INSERT INTO tweets (author_id, tweet_id, source, created_at, description) VALUES ('4759294249',	'1560250488729358336',	'Twitter for Android',	'2022-08-18 13:01:19',	'Marrying Harvey on Stardew Valley for that');
+
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deployment
+  labels:
+    app: my-mariadb-deployment
+spec:
+  # A single mariadb instance
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-mariadb
+  template:
+    metadata:
+      labels:
+        app: my-mariadb
+    spec:
+      # This is an excerpt of deployment.spec.template.spec
+      volumes:
+        - name: init-volume
+          configMap:
+            name: mariadb-deployment-init-configmap
+      containers:
+        - name: my-mariadb
+          image: mariadb
+          volumeMounts:
+            - name: init-volume
+              mountPath: /docker-entrypoint-initdb.d/
+          # Set required environment variables to initialize the container
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: "mysecretpw"
+            - name: MARIADB_DATABASE
+              value: "sportsdb"
+          ports:
+            - containerPort: 3306
+
+          startupProbe: # 60*10s -> 10 min
+            tcpSocket:
+              port: 3306
+            failureThreshold: 60
+            periodSeconds: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            periodSeconds: 10
+---
+#Begin: Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-mariadb-service
+spec:
+  selector:
+    app: my-mariadb
+  ports:
+    - name: mariadb-proto
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+#End: Service

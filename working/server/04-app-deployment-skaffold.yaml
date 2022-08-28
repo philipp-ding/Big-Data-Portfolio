@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-super-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myexpressapp
+  template:
+    metadata:
+      labels:
+        app: myexpressapp
+    spec:
+      containers:
+        - name: myexpressapp
+          image: my-super-web-app
+          ports:
+            - containerPort: 8080
