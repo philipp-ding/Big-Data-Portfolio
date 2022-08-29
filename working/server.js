@@ -56,7 +56,7 @@ async function getFromCache(key) {
 //Get data from database
 async function getFromDatabase(userid) {
 	let connection
-	let query = 'SELECT * from tweets LIMIT 5';
+	let query = 'SELECT * from popular_genres LIMIT 10';
 
 	try {
 		connection = await pool.getConnection()
@@ -66,7 +66,7 @@ async function getFromDatabase(userid) {
 
 		if (row) {
 			console.log("Query result = ", row)
-			return row["author_id"];
+			return row["genre"];
 		} else {
 			return null;
 		}

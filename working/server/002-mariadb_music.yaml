@@ -27,7 +27,20 @@ data:
     INSERT INTO genres (genre, description) VALUES ('Metal', 'Die in den 60er und 70er Jahren populär gewordene Metal Musik ist berühmt für ihre Gitarren und ihren knallharten Gesang. Unsere sorgfältig kuratierten Playlists enthalten Heavy Metal und Rockmusik wie keine andere.');
     INSERT INTO genres (genre, description) VALUES ('Pop', 'Popmusik ist ein Spiegel für das, was aktuell modern ist. Du realisierst gerade ein hippes Projekt am Zahn der Zeit? Pop scheint hier die richtige Wahl zu sein!');
     INSERT INTO genres (genre, description) VALUES ('Rock', 'Rockmusik hat sich seit der Zeit des Rock n Roll stetig weiterentwickelt und viele Genres wie Punk, Hardcore oder Britpop hervorgebracht. Dennoch ist herkömmlicher Classic-Rock immer noch ein weitverbreitetes Genre, das sich in vielen Produktionen verwenden lässt.');
-    INSERT INTO genres (genre, description) VALUES ('R&B', 'RnB Musik steht für Rhythm and Blues und hat seinen Ursprung in den 1940er Jahren und freut sich bis heute weitreichender Popularität. Wichtig ist vor allem der Einfluss auf den heutigen Hip Hop und Urban Music. R’n’B vereint Elemente von Funk, Blues, Pop, Hip Hop und Electro und passt zu einer Vielzahl an Projekten in Werbung und Film.');
+    INSERT INTO genres (genre, description) VALUES ('R&B', 'RnB Musik steht für Rhythm and Blues und hat seinen Ursprung in den 1940er Jahren und freut sich bis heute weitreichender Popularität. Wichtig ist vor allem der Einfluss auf den heutigen Hip Hop und Urban Music. RnB vereint Elemente von Funk, Blues, Pop, Hip Hop und Electro und passt zu einer Vielzahl an Projekten in Werbung und Film.');
+
+    INSERT INTO popular_genres (genre, count) VALUES ('Rock', 200);
+    INSERT INTO popular_genres (genre, count) VALUES ('Blues', 100);
+    INSERT INTO popular_genres (genre, count) VALUES ('Klassik', 20);
+    INSERT INTO popular_genres (genre, count) VALUES ('Country', 2000);
+    INSERT INTO popular_genres (genre, count) VALUES ('Electro', 250);
+    INSERT INTO popular_genres (genre, count) VALUES ('Hip Hop', 210);
+    INSERT INTO popular_genres (genre, count) VALUES ('House', 220);
+    INSERT INTO popular_genres (genre, count) VALUES ('Jazz', 230);
+    INSERT INTO popular_genres (genre, count) VALUES ('Metal', 187);
+    INSERT INTO popular_genres (genre, count) VALUES ('Pop', 110);
+    INSERT INTO popular_genres (genre, count) VALUES ('R&B', 50);
+
 
 
 ---
