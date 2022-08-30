@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  myflashcards-service-dictionary:
+    build: .
+
+  app1:
+    image: alpine
+    command: >
+      /bin/sh -c 'python tweet_test/read_tweets.py'
+
+  app2:
+    image: alpine
+    command: >
+      /bin/sh -c 'python tweet_test/receive_tweets.py'
+
