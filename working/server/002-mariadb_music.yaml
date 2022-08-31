@@ -21,7 +21,7 @@ data:
     INSERT INTO genres (genre, description) VALUES ('Klassik', 'In der Klassik strebt die Musik nach Klarheit und Verständlichkeit und hebt sich bewusst ab von der als schwülstig empfundenen Barockmusik. Statt eines improvisierten Generalbasses wird die Begleitung nun auskomponiert. Träger des kulturellen Lebens waren nicht mehr nur Adelige, sondern auch das aufstrebende Bürgertum.');
     INSERT INTO genres (genre, description) VALUES ('Country', 'Der ländliche und pastorale Charme der Country Musik kann eine ganze Reihe von Zielen erfüllen. Das Genre ist aus gutem Grund eines der beliebtesten der Welt, von den rauen Klängen des Wilden Westens bis hin zum Mainstream Country-Pop oder sogar Rap gibt es für jeden den passenden Country-Stil.');
     INSERT INTO genres (genre, description) VALUES ('Electro', 'Elektronische Musik fand ihre Heimat in modernen Nachtclubs, auf Festivals und Raves. Entdecke einige der besten EDM KünstlerInnen, die in unseren Wiedergabelisten für Tanzmusik aufgeführt sind, und finde Deinen neuen Lieblingssoundtrack für die Party am Wochenende.');
-    INSERT INTO genres (genre, description) VALUES ('Hip Hop', 'Hip Hop bzw. Rap, ist heute eines der beliebtesten Musikgenres der Welt, entwickelt sich seit seinen Anfängen in den 1970er Jahren vielfältig weiter und ist die Heimat einiger der berühmtesten KünstlerInnen der Welt!');
+    INSERT INTO genres (genre, description) VALUES ('Hip-Hop', 'Hip Hop bzw. Rap, ist heute eines der beliebtesten Musikgenres der Welt, entwickelt sich seit seinen Anfängen in den 1970er Jahren vielfältig weiter und ist die Heimat einiger der berühmtesten KünstlerInnen der Welt!');
     INSERT INTO genres (genre, description) VALUES ('House', 'Die Popularität von House wächst stetig. Ursprünglich aus Chicago stammend und mit hohem Tempo, schnellen Rhythmen und eingängigen Hooks, ist House Music eines der populärsten Genres der letzten Jahre.');
     INSERT INTO genres (genre, description) VALUES ('Jazz', 'Jazz Musik ist gefühlvoll und melodisch und gehört zu den zeitlosesten Genres, die es gibt. Lasse Dich mit unseren Wiedergabelisten in eine schwach beleuchtete, verrauchte Jazzbar entführen.');
     INSERT INTO genres (genre, description) VALUES ('Metal', 'Die in den 60er und 70er Jahren populär gewordene Metal Musik ist berühmt für ihre Gitarren und ihren knallharten Gesang. Unsere sorgfältig kuratierten Playlists enthalten Heavy Metal und Rockmusik wie keine andere.');
@@ -34,7 +34,7 @@ data:
     INSERT INTO popular_genres (genre, count) VALUES ('Klassik', 20);
     INSERT INTO popular_genres (genre, count) VALUES ('Country', 2000);
     INSERT INTO popular_genres (genre, count) VALUES ('Electro', 250);
-    INSERT INTO popular_genres (genre, count) VALUES ('Hip Hop', 210);
+    INSERT INTO popular_genres (genre, count) VALUES ('Hip-Hop', 210);
     INSERT INTO popular_genres (genre, count) VALUES ('House', 220);
     INSERT INTO popular_genres (genre, count) VALUES ('Jazz', 230);
     INSERT INTO popular_genres (genre, count) VALUES ('Metal', 187);
