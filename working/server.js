@@ -84,7 +84,7 @@ data
 //Get data from database
 async function getFromDatabaseStartpage() {
 	let connection
-	let query = 'SELECT * from popular_genres LIMIT 10 DESC'; // sorted by & desc !!!
+	let query = 'SELECT * from popular_genres ORDER BY count DESC LIMIT 10'; // sorted by & desc !!!
 
 	try {
 		connection = await pool.getConnection()
@@ -115,9 +115,9 @@ data
 
 
 
-async function getFromDatabase2(userid) {
+async function getFromDatabase_genre(userid) {
 	let connection
-	let query = 'SELECT * from genres where genre=${userid}';
+	let query = 'SELECT * from genres where genre  = ?' ; // 'SELECT * from genres where genre  = "' + connection.escape(userid)+'" '
 
 	try {
 		connection = await pool.getConnection()
@@ -199,25 +199,16 @@ function send_response_genre(response, data) {
 			<title>Music</title>
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
 			<script>
-				function fetchRandomMissions() {
-					const maxRepetitions = Math.floor(Math.random() * 200)
-					document.getElementById("out").innerText = "Fetching " + maxRepetitions + " random missions, see console output"
-					for(var i = 0; i < maxRepetitions; ++i) {
-						const missionId = Math.floor(Math.random() * 10)
-						console.log("Fetching mission id " + missionId)
-						fetch("/missions/sts-" + missionId, {cache: 'no-cache'})
-					}
-				}
+
 			</script>
 		</head>
 		<body>
-			<h1>All genre</h1>
+			<h1></h1>
 			<p>
-				<a href="javascript: fetchRandomMissions();">Randomly fetch some missions</a>
-				<span id="out"></span>
+				${data}
 			</p>
 <hr>
-			<h2>Information about the generated page</h4>
+			<h2>Information about the generated page</h2>
 	<h1>Hello k8s</h1>
 			<ul>
 				<li>Host ${os.hostname()}</li>
@@ -233,9 +224,9 @@ function send_response_genre(response, data) {
 
 
 // Redirect / to person with ID l.mlb.com - p.7491
-app.get('/', function (request, response) {
-	//response.writeHead(302, { 'Location': 'genre/pop' })
+//response.writeHead(302, { 'Location': 'genre/pop' })
 // datenbank - 10 beliebsten
+app.get('/',  async function (request, response) {
 	let data= await getFromDatabaseStartpage()
 	send_response(response,data)
 	response.end();
@@ -243,7 +234,7 @@ app.get('/', function (request, response) {
 
 // Get data about a single person
 // app.getAsync('/genre/:id', async function (request, response) {
-app.get('/genre/:id', async function (request, response) {
+app.getAsync('/genre/:id', async function (request, response) {
 	let userid = request.params["id"]
 	let key =  userid
 	let cachedata = await getFromCache(key)
@@ -253,7 +244,7 @@ app.get('/genre/:id', async function (request, response) {
 		send_response_genre(response, cachedata + " (cache hit)");
 	} else {
 		console.log(`Cache miss for key=${key}, querying database`)
-		let data= await getFromDatabase(userid)
+		let data= await getFromDatabase_genre(userid)
 		if (data) {
 			console.log(`Got data=${data}, storing in cache`)
 			//console.log(`Got tweet=${description}, storing in cache`)
