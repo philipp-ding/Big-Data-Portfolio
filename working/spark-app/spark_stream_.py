@@ -56,7 +56,7 @@ def sendData():
     Access_Token = "3154565879-0nE46vwnEMQ55KUCEXRNeZWlMd06IXYfXVIYpLv"
     Access_Token_Secret = "zOgVGCXi3Xoho2lM3XtprtbiZ3N5D7pN0192zpFleYLxv"
     client = tweepy.Client(Bearer_Token)
-    query = 'blues classic country electric hiphop house jazz meta pop rock r&b -is:retweet lang:en'
+    query = 'music -is:retweet lang:en'
     tweets = client.search_recent_tweets(
         query=query,
         tweet_fields=['context_annotations', 'created_at'],
@@ -119,9 +119,33 @@ lines = ssc.socketTextStream("127.0.0.1", 9999)
 
 # Perform transformations/actions
 words = lines.flatMap(lambda line: line.split(" "))
-pairs = words.map(lambda word: (word, 1))
+pairs = words.map(lambda word: (word, 1))  # reduce on the genre
 wordCounts = pairs.reduceByKey(lambda x, y: x + y)
 wordCounts.pprint()
+
+# blues_count = lines.filter(lambda s: "blues" in s).count()
+# classic_count = lines.filter(lambda s: "classic" in s).count()
+# house_count = lines.filter(lambda s: "house" in s).count()
+# jazz_count = lines.filter(lambda s: "jazz" in s).count()
+# country_count = lines.filter(lambda s: "country" in s).count()
+# electro_count = lines.filter(lambda s: "electro" in s).count()
+# hiphop_count = lines.filter(lambda s: "hiphop" in s).count()
+# metal_count = lines.filter(lambda s: "metal" in s).count()
+# pop_count = lines.filter(lambda s: "pop" in s).count()
+# rnb_count = lines.filter(lambda s: "R&B" in s).count()
+# rock_count = lines.filter(lambda s: "rock" in s).count()
+
+# print(blues_count)
+# print(classic_count)
+# print(house_count)
+# print(jazz_count)
+# print(country_count)
+# print(electro_count)
+# print(hiphop_count)
+# print(metal_count)
+# print(pop_count)
+# print(rnb_count)
+# print(rock_count)
 
 # Start the computation and wait for termination
 ssc.start()
