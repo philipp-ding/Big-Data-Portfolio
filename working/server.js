@@ -53,76 +53,20 @@ async function getFromCache(key) {
 	return await memcached.get(key);
 }
 
-//Get data from database
-async function getFromDatabase(userid) {
+
+async function getFromDatabase_genre() {
 	let connection
-	let query = 'SELECT * from genres'; // 'SELECT * from genres where genre  = "' + connection.escape(userid)+'" '
-
-	try {
-		connection = await pool.getConnection()
-		console.log("Executing query " + query)
-		let res = await connection.query(query, [userid])
-		let row = res[0]
-		console.log(res)
-
-		if (row) {
-			console.log("Query result = ", row)
-			return row["genre"];
-		} else {
-			return null;
-		}
-data
-	} finally {
-		if (connection)
-			connection.end()
-	}
-}
-
-
-async function getFromDatabase_start() {
-	let connection
-	let query = 'SELECT genre from genres'; // 'SELECT * from genres where genre  = "' + connection.escape(userid)+'" '
+	let query = 'SELECT genre from genres';
 
 	try {
 		connection = await pool.getConnection()
 		console.log("Executing query " + query)
 		let res = await connection.query(query, [])
-		// let row = res[0]
 		console.log(res)
 
 		if (res) {
 			console.log("Query result = ", res)
-			// let result = res["genre"]
 			console.log("Query result undefined res = ", res)
-			return res//result //row["genre"];
-		} else {
-			return null;
-		}
-data
-	} finally {
-		if (connection)
-			connection.end()
-	}
-}
-
-
-
-
-//Get data from database
-async function getFromDatabaseStartpage() {
-	let connection
-	let query = 'SELECT * from popular_genres ORDER BY count DESC LIMIT 10'; // sorted by & desc !!!
-
-	try {
-		connection = await pool.getConnection()
-		console.log("Executing query " + query)
-		let res = await connection.query(query, [])
-		// let row = res[0]
-		console.log(res)
-
-		if (res) {
-			console.log("Query result = ", res)
-			// return row["genre"];
 			return res
 		} else {
 			return null;
@@ -134,23 +78,19 @@ data
 	}
 }
 
-
-
 //Get data from database
-async function getFromDatabaseStartpage_popular() {
+async function getFromDatabase_popular_genre() {
 	let connection
-	let query = 'SELECT genre,count from popular_genres ORDER BY count DESC LIMIT 10'; // sorted by & desc !!!
+	let query = 'SELECT genre,count from popular_genres ORDER BY count DESC LIMIT 10';
 
 	try {
 		connection = await pool.getConnection()
 		console.log("Executing query " + query)
 		let res = await connection.query(query, [])
-		// let row = res[0]
 		console.log(res)
 
 		if (res) {
 			console.log("Query result = ", res)
-			// return row["genre"];
 			return res
 		} else {
 			return null;
@@ -168,9 +108,9 @@ data
 
 
 
-async function getFromDatabase_genre(userid) {
+async function getFromDatabase_genre_description(userid) {
 	let connection
-	let query = 'SELECT * from genres where genre  = ?' ; // 'SELECT * from genres where genre  = "' + connection.escape(userid)+'" '
+	let query = 'SELECT * from genres where genre  = ?' ;
 
 	try {
 		connection = await pool.getConnection()
@@ -204,7 +144,6 @@ data
 
 //Send HTML response to client
 function send_response(response,top_ten_genres) {
-	const top_genres = 10;
 	response.send(`<!DOCTYPE html>
 		<html lang="de">
 		<head>
@@ -281,13 +220,8 @@ function send_response_genre(response,userid, data) {
 
 
 
-
-// Redirect / to person with ID l.mlb.com - p.7491
-//response.writeHead(302, { 'Location': 'genre/pop' })
-// datenbank - 10 beliebsten
 app.get('/',  async function (request, response) {
-	//Promise.all([getFromDatabase_start(),getFromDatabaseStartpage_popular()]).then(values => {
-	Promise.all([getFromDatabase_start(),getFromDatabaseStartpage_popular()]).then(values => {
+	Promise.all([getFromDatabase_genre(),getFromDatabase_popular_genre()]).then(values => {
 		const genres = values[0]
 		const popular = values[1]
 
@@ -306,11 +240,9 @@ app.get('/',  async function (request, response) {
 
 	send_response(response,html)
 		});
-	//response.end();
 })
 
-// Get data about a single person
-// app.getAsync('/genre/:id', async function (request, response) {
+// Get data about a specific genre & a description
 app.getAsync('/genre/:id', async function (request, response) {
 	let userid = request.params["id"]
 	let key =  userid
@@ -322,10 +254,9 @@ app.getAsync('/genre/:id', async function (request, response) {
 		send_response_genre(response,userid ,cachedata);
 	} else {
 		console.log(`Cache miss for key=${key}, querying database`)
-		let data= await getFromDatabase_genre(userid)
+		let data= await getFromDatabase_genre_description(userid)
 		if (data) {
 			console.log(`Got data=${data}, storing in cache`)
-			//console.log(`Got tweet=${description}, storing in cache`)
 			if (memcached)
 				await memcached.set(key, data, 30 /* seconds */);
 			send_response_genre(response,userid ,data);
