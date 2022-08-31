@@ -56,7 +56,7 @@ async function getFromCache(key) {
 //Get data from database
 async function getFromDatabase(userid) {
 	let connection
-	let query = 'SELECT * from popular_genres LIMIT 10';
+	let query = 'SELECT * from genres'; // 'SELECT * from genres where genre  = "' + connection.escape(userid)+'" '
 
 	try {
 		connection = await pool.getConnection()
@@ -68,6 +68,33 @@ async function getFromDatabase(userid) {
 		if (row) {
 			console.log("Query result = ", row)
 			return row["genre"];
+		} else {
+			return null;
+		}
+data
+	} finally {
+		if (connection)
+			connection.end()
+	}
+}
+
+
+async function getFromDatabase_start() {
+	let connection
+	let query = 'SELECT genre from genres'; // 'SELECT * from genres where genre  = "' + connection.escape(userid)+'" '
+
+	try {
+		connection = await pool.getConnection()
+		console.log("Executing query " + query)
+		let res = await connection.query(query, [])
+		// let row = res[0]
+		console.log(res)
+
+		if (res) {
+			console.log("Query result = ", res)
+			// let result = res["genre"]
+			console.log("Query result undefined res = ", res)
+			return res//result //row["genre"];
 		} else {
 			return null;
 		}
@@ -108,6 +135,32 @@ data
 }
 
 
+
+//Get data from database
+async function getFromDatabaseStartpage_popular() {
+	let connection
+	let query = 'SELECT genre,count from popular_genres ORDER BY count DESC LIMIT 10'; // sorted by & desc !!!
+
+	try {
+		connection = await pool.getConnection()
+		console.log("Executing query " + query)
+		let res = await connection.query(query, [])
+		// let row = res[0]
+		console.log(res)
+
+		if (res) {
+			console.log("Query result = ", res)
+			// return row["genre"];
+			return res
+		} else {
+			return null;
+		}
+data
+	} finally {
+		if (connection)
+			connection.end()
+	}
+}
 
 
 
@@ -150,7 +203,7 @@ data
 
 
 //Send HTML response to client
-function send_response(response, data) {
+function send_response(response,sth, data) {
 	const top_genres = 10;
 	response.send(`<!DOCTYPE html>
 		<html lang="en">
@@ -177,6 +230,8 @@ function send_response(response, data) {
 				<a href="javascript: fetchRandomMissions();">Randomly fetch some missions</a>
 				<span id="out"></span>
 			</p>
+			<p>${sth} </p>
+
 <hr>
 			<h2>Information about the generated page</h4>
 	<h1>Top ${top_genres} genres </h1>
@@ -209,6 +264,7 @@ function send_response_genre(response,userid, data) {
 			<p>
 				${data}
 			</p>
+
 <hr>
 			<h2>Information about the generated page</h2>
 	<h1>Hello k8s</h1>
@@ -229,9 +285,31 @@ function send_response_genre(response,userid, data) {
 //response.writeHead(302, { 'Location': 'genre/pop' })
 // datenbank - 10 beliebsten
 app.get('/',  async function (request, response) {
-	let data= await getFromDatabaseStartpage()
-	send_response(response,data)
-	response.end();
+	let data = await getFromDatabaseStartpage()
+	//Promise.all([getFromDatabase_start(),getFromDatabaseStartpage_popular()]).then(values => {
+	Promise.all([getFromDatabase_start()]).then(values => {
+		const genres = values[0]
+		//const popular = values[1]
+
+	const genre_html = genres.map(m => `<a href='/genre/${m.genre}'>${m.genre}</a>`)
+			.join(", ")
+	/* const popularHtml = popular.result
+			.map(pop => `<li> <a href='/genre/${pop.genre}'>${pop.genre}</a> (${pop.count} views) </li>`)
+			.join("\n") */
+	const html = `
+			<h1>Top s</h1>
+			<p>
+				<ol style="margin-left: 2em;">  </ol>
+			</p>
+			<h1>All Missions</h1>
+			<p> ${genre_html} </p>
+		`
+
+
+
+	send_response(response,html,data)
+		});
+	//response.end();
 })
 
 // Get data about a single person
