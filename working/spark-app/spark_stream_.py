@@ -19,7 +19,6 @@ access_secret = "hiwyl27xXGUz5IB1MKVOW78WmvW0MmJ02idTaLzPc9N3pRawLk"
 consumer_key = "3154565879-0nE46vwnEMQ55KUCEXRNeZWlMd06IXYfXVIYpLv"
 consumer_secret = "zOgVGCXi3Xoho2lM3XtprtbiZ3N5D7pN0192zpFleYLxv"
 
-
 # class TweetsListener(Stream):
 #     # initialized the constructor
 #     def __init__(self, csocket):
@@ -57,9 +56,11 @@ def sendData():
     Access_Token = "3154565879-0nE46vwnEMQ55KUCEXRNeZWlMd06IXYfXVIYpLv"
     Access_Token_Secret = "zOgVGCXi3Xoho2lM3XtprtbiZ3N5D7pN0192zpFleYLxv"
     client = tweepy.Client(Bearer_Token)
-    query = '#petday -is:retweet lang:en'
-    tweets = client.search_recent_tweets(query=query, tweet_fields=[
-                                         'context_annotations', 'created_at'], max_results=100)
+    query = 'blues classic country electric hiphop house jazz meta pop rock r&b -is:retweet lang:en'
+    tweets = client.search_recent_tweets(
+        query=query,
+        tweet_fields=['context_annotations', 'created_at'],
+        max_results=100)
     tweets_text = [tweet.text for tweet in tweets.data]
     return tweets_text
 
@@ -85,7 +86,6 @@ def sendData():
 #     # Keep the stream data available
 #     sendData(c)
 
-
 # threading.Thread(target=server_function, daemon=True).start()
 
 
@@ -109,7 +109,6 @@ threading.Thread(target=start_server_thread, daemon=True).start()
 #######################
 # Listener
 #######################
-
 
 # BEGIN-SNIPPET
 
