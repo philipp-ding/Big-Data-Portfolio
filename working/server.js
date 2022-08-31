@@ -212,24 +212,19 @@ function send_response(response,top_ten_genres) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 			<title>Musik Genres</title>
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
-			<script>
-				function fetchRandomMissions() {
-					const maxRepetitions = Math.floor(Math.random() * 200)
-					document.getElementById("out").innerText = "Fetching " + maxRepetitions + " random missions, see console output"
-					for(var i = 0; i < maxRepetitions; ++i) {
-						const missionId = Math.floor(Math.random() * 10)
-						console.log("Fetching mission id " + missionId)
-						fetch("/missions/sts-" + missionId, {cache: 'no-cache'})
-					}
-				}
-			</script>
-		</head>
+		<style>
+			body {background-color: black;}
+			h1 {color: white;}
+			p {color: white;}
+			h2 {color: white;}
+			ul {color: white;}
+			ol {color: white;}
+			a { color: #1DB954;}
+			</style>
+			</head>
 		<body>
 			<h1>Musik Genres</h1>
-			<p>
-				<a href="javascript: fetchRandomMissions();">Randomly fetch some missions</a>
-				<span id="out"></span>
-			</p>
+			<p style="margin-bottom:2%"> </p>
 			<p>${top_ten_genres} </p>
 
 <hr>
@@ -255,20 +250,26 @@ function send_response_genre(response,userid, data) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 			<title>Musik Genres</title>
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
-			<script>
+			<style>
+			body {background-color: black;}
+			h1 {color: white;}
+			p {color: white;}
+			h2 {color: white;}
+			ul {color: white;}
+			a { color: #1DB954;}
 
-			</script>
+			</style>
 		</head>
 		<body>
-			<h1>Musik Genre: ${userid}</h1>
+			<h1>${userid}</h1>
 			<p>
 				${data}
 			</p>
-			<a href="/">Zurück zur Startseite</a>
+			<a href="/" style="color: #1DB954;">Zurück zur Startseite</a>
 
 <hr>
 			<h2>Informationen zu der generierten Seite</h2>
-			<ul>
+			<ul >
 				<li>Host ${os.hostname()}</li>
 				<li>Date: ${new Date()}</li>
 				<li>Memcached Servers: ${memcachedServers}</li>
@@ -290,17 +291,17 @@ app.get('/',  async function (request, response) {
 		const genres = values[0]
 		const popular = values[1]
 
-	const genre_html = genres.map(m => `<a href='/genre/${m.genre}'>${m.genre}</a>`)
+	const genre_html = genres.map(m => `<a href='/genre/${m.genre}' style="color: #1DB954;">${m.genre}</a>`)
 			.join(", ")
 	const popularHtml = popular
-			.map(pop => `<li> <a href='/genre/${pop.genre}'>${pop.genre}</a> (${pop.count} views) </li>`)
+			.map(pop => `<li> <a href='/genre/${pop.genre}' style="color: #1DB954;">${pop.genre}</a> (${pop.count} views) </li>`)
 			.join("\n")
 	const html = `
-			<h1>Top 10 Genres</h1>
+			<h2>Top 10 Genres</h2>
 			<p>
 				<ol style="margin-left: 2em;"> ${popularHtml} </ol>
 			</p>
-			<h1>Alle Genres</h1>
+			<h2>Alle Genres</h2>
 			<p> ${genre_html} </p>`
 
 	send_response(response,html)
