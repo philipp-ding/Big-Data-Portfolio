@@ -151,6 +151,7 @@ data
 
 //Send HTML response to client
 function send_response(response, data) {
+	const top_genres = 10;
 	response.send(`<!DOCTYPE html>
 		<html lang="en">
 		<head>
@@ -178,7 +179,7 @@ function send_response(response, data) {
 			</p>
 <hr>
 			<h2>Information about the generated page</h4>
-	<h1>Hello k8s</h1>
+	<h1>Top ${top_genres} genres </h1>
 			<ul>
 				<li>Host ${os.hostname()}</li>
 				<li>Date: ${new Date()}</li>
@@ -190,7 +191,8 @@ function send_response(response, data) {
 }
 
 
-function send_response_genre(response, data) {
+function send_response_genre(response,userid, data) {
+
 	response.send(`<!DOCTYPE html>
 		<html lang="en">
 		<head>
@@ -203,7 +205,7 @@ function send_response_genre(response, data) {
 			</script>
 		</head>
 		<body>
-			<h1></h1>
+			<h1>Genre: ${userid}</h1>
 			<p>
 				${data}
 			</p>
@@ -214,7 +216,7 @@ function send_response_genre(response, data) {
 				<li>Host ${os.hostname()}</li>
 				<li>Date: ${new Date()}</li>
 				<li>Memcached Servers: ${memcachedServers}</li>
-				<li>Result: <b>${data}</b></li>
+				<li>Result: <b>${userid}</b></li>
 			</ul>
 			</body>
 	</html>`);
@@ -239,9 +241,10 @@ app.getAsync('/genre/:id', async function (request, response) {
 	let key =  userid
 	let cachedata = await getFromCache(key)
 
+
 	if (cachedata) {
 		console.log(`Cache hit for key=${key}, cachedata = ${cachedata}`)
-		send_response_genre(response, cachedata + " (cache hit)");
+		send_response_genre(response,userid ,cachedata + " (cache hit)");
 	} else {
 		console.log(`Cache miss for key=${key}, querying database`)
 		let data= await getFromDatabase_genre(userid)
@@ -250,9 +253,9 @@ app.getAsync('/genre/:id', async function (request, response) {
 			//console.log(`Got tweet=${description}, storing in cache`)
 			if (memcached)
 				await memcached.set(key, data, 30 /* seconds */);
-			send_response_genre(response, data + " (cache miss) ");
+			send_response_genre(response,userid ,data + " (cache miss) ");
 		} else {
-			send_response_genre(response, "No data found");
+			send_response_genre(response,userid ,"No data found");
 		}
 	}
 })
