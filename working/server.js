@@ -203,14 +203,14 @@ data
 
 
 //Send HTML response to client
-function send_response(response,sth, data) {
+function send_response(response,top_ten_genres) {
 	const top_genres = 10;
 	response.send(`<!DOCTYPE html>
-		<html lang="en">
+		<html lang="de">
 		<head>
 			<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>Music</title>
+			<title>Musik Genres</title>
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
 			<script>
 				function fetchRandomMissions() {
@@ -225,21 +225,21 @@ function send_response(response,sth, data) {
 			</script>
 		</head>
 		<body>
-			<h1>All genre</h1>
+			<h1>Musik Genres</h1>
 			<p>
 				<a href="javascript: fetchRandomMissions();">Randomly fetch some missions</a>
 				<span id="out"></span>
 			</p>
-			<p>${sth} </p>
+			<p>${top_ten_genres} </p>
 
 <hr>
-			<h2>Information about the generated page</h4>
-	<h1>Top ${top_genres} genres </h1>
+			<h2>Informationen zu der generierten Seite</h4>
+
 			<ul>
 				<li>Host ${os.hostname()}</li>
 				<li>Date: ${new Date()}</li>
 				<li>Memcached Servers: ${memcachedServers}</li>
-				<li>Result: <b>${data}</b></li>
+				<li>Result: <b></b></li>
 			</ul>
 			</body>
 	</html>`);
@@ -249,25 +249,25 @@ function send_response(response,sth, data) {
 function send_response_genre(response,userid, data) {
 
 	response.send(`<!DOCTYPE html>
-		<html lang="en">
+		<html lang="de">
 		<head>
 			<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>Music</title>
+			<title>Musik Genres</title>
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
 			<script>
 
 			</script>
 		</head>
 		<body>
-			<h1>Genre: ${userid}</h1>
+			<h1>Musik Genre: ${userid}</h1>
 			<p>
 				${data}
 			</p>
+			<a href="/">Zurück zur Startseite</a>
 
 <hr>
-			<h2>Information about the generated page</h2>
-	<h1>Hello k8s</h1>
+			<h2>Informationen zu der generierten Seite</h2>
 			<ul>
 				<li>Host ${os.hostname()}</li>
 				<li>Date: ${new Date()}</li>
@@ -285,29 +285,25 @@ function send_response_genre(response,userid, data) {
 //response.writeHead(302, { 'Location': 'genre/pop' })
 // datenbank - 10 beliebsten
 app.get('/',  async function (request, response) {
-	let data = await getFromDatabaseStartpage()
 	//Promise.all([getFromDatabase_start(),getFromDatabaseStartpage_popular()]).then(values => {
-	Promise.all([getFromDatabase_start()]).then(values => {
+	Promise.all([getFromDatabase_start(),getFromDatabaseStartpage_popular()]).then(values => {
 		const genres = values[0]
-		//const popular = values[1]
+		const popular = values[1]
 
 	const genre_html = genres.map(m => `<a href='/genre/${m.genre}'>${m.genre}</a>`)
 			.join(", ")
-	/* const popularHtml = popular.result
+	const popularHtml = popular
 			.map(pop => `<li> <a href='/genre/${pop.genre}'>${pop.genre}</a> (${pop.count} views) </li>`)
-			.join("\n") */
+			.join("\n")
 	const html = `
-			<h1>Top s</h1>
+			<h1>Top 10 Genres</h1>
 			<p>
-				<ol style="margin-left: 2em;">  </ol>
+				<ol style="margin-left: 2em;"> ${popularHtml} </ol>
 			</p>
-			<h1>All Missions</h1>
-			<p> ${genre_html} </p>
-		`
+			<h1>Alle Genres</h1>
+			<p> ${genre_html} </p>`
 
-
-
-	send_response(response,html,data)
+	send_response(response,html)
 		});
 	//response.end();
 })
@@ -322,7 +318,7 @@ app.getAsync('/genre/:id', async function (request, response) {
 
 	if (cachedata) {
 		console.log(`Cache hit for key=${key}, cachedata = ${cachedata}`)
-		send_response_genre(response,userid ,cachedata + " (cache hit)");
+		send_response_genre(response,userid ,cachedata);
 	} else {
 		console.log(`Cache miss for key=${key}, querying database`)
 		let data= await getFromDatabase_genre(userid)
@@ -331,7 +327,7 @@ app.getAsync('/genre/:id', async function (request, response) {
 			//console.log(`Got tweet=${description}, storing in cache`)
 			if (memcached)
 				await memcached.set(key, data, 30 /* seconds */);
-			send_response_genre(response,userid ,data + " (cache miss) ");
+			send_response_genre(response,userid ,data);
 		} else {
 			send_response_genre(response,userid ,"No data found");
 		}
