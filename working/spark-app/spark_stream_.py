@@ -9,6 +9,8 @@ import time
 import mysql.connector
 import tweepy
 from pyspark import SparkContext
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import explode, split
 from pyspark.streaming import StreamingContext
 from tweepy import OAuthHandler  # to authenticate Twitter API
 from tweepy import Stream
@@ -113,54 +115,65 @@ threading.Thread(target=start_server_thread, daemon=True).start()
 #######################
 
 # BEGIN-SNIPPET
+spark = SparkSession.builder \
+    .appName("Structured Streaming").getOrCreate()
 
-# Create local StreamingContext with a batch interval of 10s
-sc = SparkContext("local[*]", "DStream Example")
-ssc = StreamingContext(sc, 10)  # seconds
-lines = ssc.socketTextStream("127.0.0.1", 9999)
+spark.sparkContext.setLogLevel('ERROR')
 
-# Perform transformations/actions
-# split each tweet into words
-words = lines.flatMap(lambda line: line.split(" "))
+lines = spark.readStream.format("socket") \
+    .option("host", "127.0.0.1").option("port", 9999).load()
 
-# list to filter the tweets to get only the genres, then map each hashtag to be a pair of (hashtag,1) and grouping them by reducing to the keys
+words = lines.select(explode(split(lines.value, " ")).alias("word"))
+wordCounts = words.groupBy("word").count()
+
 genres = [
     'blues', 'Blues', 'classic', 'Classic', 'house', 'House', 'jazz', 'Jazz',
     'country', 'Country', 'electro', 'Electro', 'hiphop', 'Hip Hop', 'metal',
     'Metal', 'pop', 'Pop', 'rnb', 'Rnb', 'rock', 'Rock'
 ]
 
+genreCounts = wordCounts.filter(
+    wordCounts.word in genres).groupBy("word").count().sort(desc("count"))
+query = wordCounts.writeStream.outputMode("complete") \
+    .format("console").start()
+query.awaitTermination()
+
+# Create local StreamingContext with a batch interval of 10s
+# sc = SparkContext("local[*]", "DStream Example")
+# ssc = StreamingContext(sc, 10)  # seconds
+# lines = ssc.socketTextStream("127.0.0.1", 9999)
+
+# Perform transformations/actions
+# split each tweet into words
+# words = lines.flatMap(lambda line: line.split(" "))
+
+# list to filter the tweets to get only the genres, then map each hashtag to be a pair of (hashtag,1) and grouping them by reducing to the keys
+
 # extracting and counting only the predefined genres from the tweets
-genreCounts = words.filter(lambda w: w in genres).map(
-    lambda x: (x, 1)).reduceByKey(lambda z, y: z + y)
+# genreCounts = words.filter(lambda w: w in genres).map(
+#     lambda x: (x, 1)).reduceByKey(lambda z, y: z + y)
 # genreCounts_rows = genreCounts.map(lambda w: Row(word=w))
 # genreCounts_rows.pprint()
 # printing the counted genres
-genreCounts.pprint()
+# genreCounts.pprint()
 
-dbOptions = {
-    "host": "my-app-mariadb-service",
-    'port': 3306,
-    "user": "root",
-    "password": "mysecretpw"
-}
-dbSchema = 'popular_genres'
+# dbSchema = 'popular_genres'
 
-con = mysql.connector.connect(host="10.109.228.95",
-                              port=3306,
-                              database='sportsdb',
-                              user="root",
-                              password="mysecretpw")
+# con = mysql.connector.connect(host="10.109.228.95",
+#                               port=3306,
+#                               database='sportsdb',
+#                               user="root",
+#                               password="mysecretpw")
 
-cursor = con.cursor()
+# cursor = con.cursor()
 
-query = 'INSERT INTO popular_genres (genre, count) VALUES ("test", 100) ON DUPLICATE KEY UPDATE count=100;'
+# query = 'INSERT INTO popular_genres (genre, count) VALUES ("test", 100) ON DUPLICATE KEY UPDATE count=100;'
 
-cursor.execute(query)
-con.commit()
+# cursor.execute(query)
+# con.commit()
 
-cursor.close()
-con.close()
+# cursor.close()
+# con.close()
 
 # session = mysql.connector.get_session(dbOptions)
 # session.sql("USE popular").execute()
@@ -194,7 +207,7 @@ con.close()
 # spark.streams.awaitAnyTermination()
 
 # start the streaming computation
-ssc.start()
+#ssc.start()
 # wait for the streaming to finish
-ssc.awaitTermination()
+#ssc.awaitTermination()
 # ssc.streams.awaitAnyTermination()
