@@ -118,51 +118,22 @@ ssc = StreamingContext(sc, 10)  # seconds
 lines = ssc.socketTextStream("127.0.0.1", 9999)
 
 # Perform transformations/actions
-# words = lines.flatMap(lambda line: line.split(" "))
-# pairs = words.map(lambda word: (word, 1))  # reduce on the genre
-# wordCounts = pairs.reduceByKey(lambda x, y: x + y)
-# wordCounts.pprint()
-# pairs.pprint()
-
 # split each tweet into words
 words = lines.flatMap(lambda line: line.split(" "))
-# filter the words to get only hashtags, then map each hashtag to be a pair of (hashtag,1)
+
+# list to filter the tweets to get only the genres, then map each hashtag to be a pair of (hashtag,1) and grouping them by reducing to the keys
 genres = [
     'blues', 'Blues', 'classic', 'Classic', 'house', 'House', 'jazz', 'Jazz',
     'country', 'Country', 'electro', 'Electro', 'hiphop', 'Hip Hop', 'metal',
     'Metal', 'pop', 'Pop', 'rnb', 'Rnb', 'rock', 'Rock'
 ]
-# genres = words.filter(lambda w: 'pop' in w).map(lambda x: (x, 1))
-# genres.pprint()
-pairs = words.map(lambda word: (word, 1))
-wordCounts = pairs.reduceByKey(lambda z, y: z + y)
 
-bluesCount = wordCounts.filter(lambda w: 'blues' in w)
-classicCount = wordCounts.filter(lambda w: 'classic' in w)
-houseCount = wordCounts.filter(lambda w: 'house' in w)
-jazzCount = wordCounts.filter(lambda w: 'jazz' in w)
-countryCount = wordCounts.filter(lambda w: 'country' in w)
-electroCount = wordCounts.filter(lambda w: 'electro' in w)
-hiphopCount = wordCounts.filter(lambda w: 'hiphop' in w)
-metalCount = wordCounts.filter(lambda w: 'metal' in w)
-popCount = wordCounts.filter(lambda w: 'pop' in w)
-rnbCount = wordCounts.filter(lambda w: 'rnb' in w)
-rockCount = wordCounts.filter(lambda w: 'rock' in w)
+# extracting and counting only the predefined genres from the tweets
+genreCounts = words.filter(lambda w: w in genres).map(
+    lambda x: (x, 1)).reduceByKey(lambda z, y: z + y)
 
-bluesCount.pprint()
-classicCount.pprint()
-houseCount.pprint()
-jazzCount.pprint()
-countryCount.pprint()
-electroCount.pprint()
-hiphopCount.pprint()
-metalCount.pprint()
-popCount.pprint()
-rnbCount.pprint()
-rockCount.pprint()
-
-# wordCounts.pprint()
-# genres.pprint()
+# printing the counted genres
+genreCounts.pprint()
 
 # start the streaming computation
 ssc.start()
