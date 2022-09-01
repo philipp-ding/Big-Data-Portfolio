@@ -4,7 +4,7 @@
 
 - Docker Desktop starten
 - Kubernetes aktivieren & starten
-- `minikube start`
+- cmd: `minikube start`
 
 ## Vorraussetzungen
 
@@ -23,14 +23,14 @@ helm repo add stable https://charts.helm.sh/stable
 helm install --namespace=default --set hdfs.dataNode.replicas=1 --set yarn.nodeManager.replicas=1 --set hdfs.webhdfs.enabled=true my-hadoop-cluster stable/hadoop
 ```
 
-### starten der App: (innerhalb des Ordners working der skaffold.yaml enthält)
+### starten der App: (innerhalb des Ordners working der skaffold.yaml enthält) CMD
 
 `skaffold dev`
 
 Alternative:
 
-- skaffold run für production --> Code changes werden nicht automatisch erneuert
-- skaffold debug
+- `skaffold run` für production --> Code changes werden nicht automatisch erneuert
+- `skaffold debug`
 
 skaffold.exe muss auf dem Computer zum ausführen dises Befehls vorhanden sein
 
