@@ -6,5 +6,5 @@ FROM openjdk:${OPENJDK_VERSION}-${IMAGE_VARIANT}
 COPY --from=py3 / /
 ARG PYSPARK_VERSION=3.2.0
 ADD . /spark-app
-RUN pip install tweepy && pip install pyspark==${PYSPARK_VERSION}
+RUN pip install tweepy && pip install --no-cache-dir pyspark==${PYSPARK_VERSION}
 CMD python spark-app/spark_stream_.py

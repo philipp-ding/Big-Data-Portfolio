@@ -1,2 +1,0 @@
-tweepy
-pyspark == 3.2.0

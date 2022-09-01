@@ -118,35 +118,30 @@ ssc = StreamingContext(sc, 10)  # seconds
 lines = ssc.socketTextStream("127.0.0.1", 9999)
 
 # Perform transformations/actions
+# words = lines.flatMap(lambda line: line.split(" "))
+# pairs = words.map(lambda word: (word, 1))  # reduce on the genre
+# wordCounts = pairs.reduceByKey(lambda x, y: x + y)
+# wordCounts.pprint()
+# pairs.pprint()
+
+# split each tweet into words
 words = lines.flatMap(lambda line: line.split(" "))
-pairs = words.map(lambda word: (word, 1))  # reduce on the genre
-wordCounts = pairs.reduceByKey(lambda x, y: x + y)
-wordCounts.pprint()
+# filter the words to get only hashtags, then map each hashtag to be a pair of (hashtag,1)
+genres = [
+    'blues', 'Blues', 'classic', 'Classic', 'house', 'House', 'jazz', 'Jazz',
+    'country', 'Country', 'electro', 'Electro', 'hiphop', 'Hip Hop', 'metal',
+    'Metal', 'pop', 'Pop', 'rnb', 'Rnb', 'rock', 'Rock'
+]
+# genres = words.filter(lambda w: 'pop' in w).map(lambda x: (x, 1))
+# genres.pprint()
+pairs = words.map(lambda word: (word, 1))
+wordCounts = genres.reduceByKey(lambda z, y: z + y)
+rockCount = wordCounts.filter(lambda w: 'rock' in w)
+rockCount.pprint()
+# wordCounts.pprint()
+# genres.pprint()
 
-# blues_count = lines.filter(lambda s: "blues" in s).count()
-# classic_count = lines.filter(lambda s: "classic" in s).count()
-# house_count = lines.filter(lambda s: "house" in s).count()
-# jazz_count = lines.filter(lambda s: "jazz" in s).count()
-# country_count = lines.filter(lambda s: "country" in s).count()
-# electro_count = lines.filter(lambda s: "electro" in s).count()
-# hiphop_count = lines.filter(lambda s: "hiphop" in s).count()
-# metal_count = lines.filter(lambda s: "metal" in s).count()
-# pop_count = lines.filter(lambda s: "pop" in s).count()
-# rnb_count = lines.filter(lambda s: "R&B" in s).count()
-# rock_count = lines.filter(lambda s: "rock" in s).count()
-
-# print(blues_count)
-# print(classic_count)
-# print(house_count)
-# print(jazz_count)
-# print(country_count)
-# print(electro_count)
-# print(hiphop_count)
-# print(metal_count)
-# print(pop_count)
-# print(rnb_count)
-# print(rock_count)
-
-# Start the computation and wait for termination
+# start the streaming computation
 ssc.start()
+# wait for the streaming to finish
 ssc.awaitTermination()
