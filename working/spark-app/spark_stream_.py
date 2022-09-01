@@ -2,9 +2,11 @@
 import json
 import socket
 import socketserver
+import sys
 import threading
 import time
 
+import mysql.connector
 import tweepy
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
@@ -131,11 +133,68 @@ genres = [
 # extracting and counting only the predefined genres from the tweets
 genreCounts = words.filter(lambda w: w in genres).map(
     lambda x: (x, 1)).reduceByKey(lambda z, y: z + y)
-
+# genreCounts_rows = genreCounts.map(lambda w: Row(word=w))
+# genreCounts_rows.pprint()
 # printing the counted genres
 genreCounts.pprint()
+
+dbOptions = {
+    "host": "my-app-mariadb-service",
+    'port': 3306,
+    "user": "root",
+    "password": "mysecretpw"
+}
+dbSchema = 'popular_genres'
+
+con = mysql.connector.connect(host="10.109.228.95",
+                              port=3306,
+                              database='sportsdb',
+                              user="root",
+                              password="mysecretpw")
+
+cursor = con.cursor()
+
+query = 'INSERT INTO popular_genres (genre, count) VALUES ("test", 100) ON DUPLICATE KEY UPDATE count=100;'
+
+cursor.execute(query)
+con.commit()
+
+cursor.close()
+con.close()
+
+# session = mysql.connector.get_session(dbOptions)
+# session.sql("USE popular").execute()
+
+# def saveToDatabase(batchDataframe, batchId):
+#     # Define function to save a dataframe to mysql
+#     def save_to_db(iterator):
+#         # Connect to database and use schema
+#         session = mysqlx.get_session(dbOptions)
+#         session.sql("USE popular").execute()
+
+#         for row in iterator:
+#             # Run upsert (insert or update existing)
+#             sql = session.sql("INSERT INTO popular_genres "
+#                               "(genre, count) VALUES (?, ?) "
+#                               "ON DUPLICATE KEY UPDATE count=?")
+#             sql.bind(row.mission, row.views, row.views).execute()
+
+#         session.close()
+
+#     # Perform batch UPSERTS per data partition
+#     batchDataframe.foreachPartition(save_to_db)
+
+# dbInsertStream = popular.writeStream \
+#     .trigger(processingTime=slidingDuration) \
+#     .outputMode("update") \
+#     .foreachBatch(saveToDatabase) \
+#     .start()
+
+# Wait for termination
+# spark.streams.awaitAnyTermination()
 
 # start the streaming computation
 ssc.start()
 # wait for the streaming to finish
 ssc.awaitTermination()
+# ssc.streams.awaitAnyTermination()
