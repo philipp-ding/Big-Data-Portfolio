@@ -10,7 +10,7 @@ import mysql.connector
 import tweepy
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import explode, split
+from pyspark.sql.functions import desc, explode, regexp_extract, split
 from pyspark.streaming import StreamingContext
 from tweepy import OAuthHandler  # to authenticate Twitter API
 from tweepy import Stream
@@ -124,7 +124,7 @@ lines = spark.readStream.format("socket") \
     .option("host", "127.0.0.1").option("port", 9999).load()
 
 words = lines.select(explode(split(lines.value, " ")).alias("word"))
-wordCounts = words.groupBy("word").count()
+wordCounts = words.groupBy("word").count().withColumnRenamed('count', 'views')
 
 genres = [
     'blues', 'Blues', 'classic', 'Classic', 'house', 'House', 'jazz', 'Jazz',
@@ -132,11 +132,105 @@ genres = [
     'Metal', 'pop', 'Pop', 'rnb', 'Rnb', 'rock', 'Rock'
 ]
 
-genreCounts = wordCounts.filter(
-    wordCounts.word in genres).groupBy("word").count().sort(desc("count"))
+# genreCounts = words.filter(lambda w: w in genres).map(
+#    lambda x: (x, 1)).reduceByKey(lambda z, y: z + y)
+
+# genreCounts = wordCounts.filter(
+#     wordCounts.word in genres).groupBy("word").count()
+
+# Filter out empty lines, group, count, and sort
+
+# regexp = lines.select(regexp_extract(lines.value, genres, 1).alias("genres"))
+
+# logCounts = regexp.filter(regexp.genres != "") \
+#     .groupBy("genres").count().sort(desc("count"))
+
 query = wordCounts.writeStream.outputMode("complete") \
     .format("console").start()
+
+
+def databaseconnection(batchDataframe, batchId):
+    def save_to_db(iterator):
+
+        dbconnection = mysql.connector.connect(host="10.105.101.209",
+                                               port=3306,
+                                               database='sportsdb',
+                                               user="root",
+                                               password="mysecretpw")
+        cursor = dbconnection.cursor()
+        genres = [
+            'blues', 'Blues', 'classic', 'Classic', 'house', 'House', 'jazz',
+            'Jazz', 'country', 'Country', 'electro', 'Electro', 'hiphop',
+            'Hip Hop', 'metal', 'Metal', 'pop', 'Pop', 'rnb', 'Rnb', 'rock',
+            'Rock'
+        ]
+
+        for row in iterator:
+            if row.word in genres:
+                query_mariadb = f"INSERT INTO popular_genres (genre, count) VALUES ('{row.word}', {row.views}) ON DUPLICATE KEY UPDATE count={row.views};"
+                cursor.execute(query_mariadb)
+        dbconnection.commit()
+        cursor.close()
+        dbconnection.close()
+
+    # Perform batch UPSERTS per data partition
+    batchDataframe.foreachPartition(save_to_db)
+
+
+dbInsertStream = wordCounts.writeStream \
+    .outputMode("update") \
+    .foreachBatch(databaseconnection) \
+    .start()
+
 query.awaitTermination()
+spark.Streams.awaitTermination()
+
+# query_mariadb = 'INSERT INTO popular_genres (genre, count) VALUES ("test", 1000) ON DUPLICATE KEY UPDATE count=1000;'
+# cursor.execute(query_mariadb)
+# dbconnection.commit()
+# cursor.close()
+# dbconnection.close()
+
+# def saveToDatabase(batchDataframe, batchId):
+#     # Define function to save a dataframe to mysql
+#     def save_to_db(iterator):
+#         # Connect to database and use schema
+#         con = mysql.connector.connect(host="10.109.228.95",
+#                                       port=3306,
+#                                       database='sportsdb',
+#                                       user="root",
+#                                       password="mysecretpw")
+#         cursor = con.cursor()
+#         query = 'INSERT INTO popular_genres (genre, count) VALUES ("test", 100) ON DUPLICATE KEY UPDATE count=100;'
+#         cursor.execute(query)
+#         con.commit()
+
+#         cursor.close()
+#         # con.close()
+
+#         # session.sql("USE popular").execute()
+
+#         for row in iterator:
+#             # Run upsert (insert or update existing)
+#             sql = con.sql("INSERT INTO popular_genres "
+#                           "(word, count) VALUES (?, ?) "
+#                           "ON DUPLICATE KEY UPDATE count=?")
+#             sql.bind(row.mission, row.views, row.views).execute()
+
+#         con.close()
+
+#     # Perform batch UPSERTS per data partition
+#     batchDataframe.foreachPartition(save_to_db)
+
+# # Example Part 7
+
+# dbInsertStream = wordCounts.writeStream \
+#     .outputMode("update") \
+#     .foreachBatch(saveToDatabase) \
+#     .start()
+# #    .trigger(processingTime=slidingDuration) \
+
+spark.streams.awaitAnyTermination()
 
 # Create local StreamingContext with a batch interval of 10s
 # sc = SparkContext("local[*]", "DStream Example")
