@@ -4,6 +4,8 @@ build:
   artifacts:
     - image: my-super-web-app
       context: .
+    - image: spark-app
+      context: ./spark-app
 
 deploy:
   kubectl:
@@ -14,9 +16,13 @@ deploy:
       - ./server/04-app-deployment-skaffold.yaml
       - ./server/04-app-service-and-ingress.yaml
 
-# portForward:
-# - resourceType: deployment
-#   resourceName: my-super-app-service
-#   namespace: service
-#   port: 8080
-#   localPort: 8080
+portForward:
+  - resourceType: deployment
+    resourceName: my-super-app-service
+    namespace: service
+    port: 8080
+    localPort: 8080
+  - resourceType: service
+    resourceName: my-app-mariadb-service
+    port: 3306
+    localPort: 3306
