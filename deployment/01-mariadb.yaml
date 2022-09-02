@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-deployment-init-configmap
+data:
+  mariadb-init.sql: |
+    CREATE TABLE `genres` (
+      `genre` VARCHAR(30) NOT NULL,
+      `description`  VARCHAR(5000),
+      PRIMARY KEY (`genre`)
+    );
+
+    CREATE TABLE `popular_genres` (
+      `genre` VARCHAR(30) NOT NULL,
+      `count` BIGINT,
+       PRIMARY KEY (`genre`)
+    );
+
+    INSERT INTO genres (genre, description) VALUES ('Blues', 'Blues Musik mag zu Beginn des 20. Jahrhunderts entstanden sein, aber es ist nichts Veraltetes daran. Mit ihren eingaengigen Swing-Rhythmen und wandelnden Basslinien bieten unsere Blues Playlists alles, was Du von Blues und Jazz erwartest. Titel mit swingenden Saxophon Arrangements und gefuehlvollem Gesang bilden die perfekte Blues Hintergrundmusik.');
+    INSERT INTO genres (genre, description) VALUES ('Klassik', 'In der Klassik strebt die Musik nach Klarheit und Verstaendlichkeit und hebt sich bewusst ab von der als schwuelstig empfundenen Barockmusik. Statt eines improvisierten Generalbasses wird die Begleitung nun auskomponiert. Traeger des kulturellen Lebens waren nicht mehr nur Adelige, sondern auch das aufstrebende Buergertum.');
+    INSERT INTO genres (genre, description) VALUES ('Country', 'Der laendliche und pastorale Charme der Country Musik kann eine ganze Reihe von Zielen erfuellen. Das Genre ist aus gutem Grund eines der beliebtesten der Welt, von den rauen Klaengen des Wilden Westens bis hin zum Mainstream Country-Pop oder sogar Rap gibt es fuer jeden den passenden Country-Stil.');
+    INSERT INTO genres (genre, description) VALUES ('Electro', 'Elektronische Musik fand ihre Heimat in modernen Nachtclubs, auf Festivals und Raves. Entdecke einige der besten EDM KuenstlerInnen, die in unseren Wiedergabelisten fuer Tanzmusik aufgefuehrt sind, und finde Deinen neuen Lieblingssoundtrack fuer die Party am Wochenende.');
+    INSERT INTO genres (genre, description) VALUES ('Hip-Hop', 'Hip Hop bzw. Rap, ist heute eines der beliebtesten Musikgenres der Welt, entwickelt sich seit seinen Anfaengen in den 1970er Jahren vielfaeltig weiter und ist die Heimat einiger der beruehmtesten KuenstlerInnen der Welt!');
+    INSERT INTO genres (genre, description) VALUES ('House', 'Die Popularitaet von House waechst stetig. Urspruenglich aus Chicago stammend und mit hohem Tempo, schnellen Rhythmen und eingaengigen Hooks, ist House Music eines der populaersten Genres der letzten Jahre.');
+    INSERT INTO genres (genre, description) VALUES ('Jazz', 'Jazz Musik ist gefuehlvoll und melodisch und gehoert zu den zeitlosesten Genres, die es gibt. Lasse Dich mit unseren Wiedergabelisten in eine schwach beleuchtete, verrauchte Jazzbar entfuehren.');
+    INSERT INTO genres (genre, description) VALUES ('Metal', 'Die in den 60er und 70er Jahren populaer gewordene Metal Musik ist beruehmt fuer ihre Gitarren und ihren knallharten Gesang. Unsere sorgfaeltig kuratierten Playlists enthalten Heavy Metal und Rockmusik wie keine andere.');
+    INSERT INTO genres (genre, description) VALUES ('Pop', 'Popmusik ist ein Spiegel fuer das, was aktuell modern ist. Du realisierst gerade ein hippes Projekt am Zahn der Zeit? Pop scheint hier die richtige Wahl zu sein!');
+    INSERT INTO genres (genre, description) VALUES ('Rock', 'Rockmusik hat sich seit der Zeit des Rock n Roll stetig weiterentwickelt und viele Genres wie Punk, Hardcore oder Britpop hervorgebracht. Dennoch ist herkoemmlicher Classic-Rock immer noch ein weitverbreitetes Genre, das sich in vielen Produktionen verwenden laesst.');
+    INSERT INTO genres (genre, description) VALUES ('R&B', 'RnB Musik steht fuer Rhythm and Blues und hat seinen Ursprung in den 1940er Jahren und freut sich bis heute weitreichender Popularitaet. Wichtig ist vor allem der Einfluss auf den heutigen Hip Hop und Urban Music. RnB vereint Elemente von Funk, Blues, Pop, Hip Hop und Electro und passt zu einer Vielzahl an Projekten in Werbung und Film.');
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deployment
+  labels:
+    app: my-mariadb-deployment
+spec:
+  # A single mariadb instance
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-mariadb
+  template:
+    metadata:
+      labels:
+        app: my-mariadb
+    spec:
+      # This is an excerpt of deployment.spec.template.spec
+      volumes:
+        - name: init-volume
+          configMap:
+            name: mariadb-deployment-init-configmap
+      containers:
+        - name: my-mariadb
+          image: mariadb:10.7.4
+          volumeMounts:
+            - name: init-volume
+              mountPath: /docker-entrypoint-initdb.d/
+          # Set required environment variables to initialize the container
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: "mysecretpw"
+            - name: MARIADB_DATABASE
+              value: "sportsdb"
+          ports:
+            - containerPort: 3306
+
+          startupProbe: # 60*10s -> 10 min
+            tcpSocket:
+              port: 3306
+            failureThreshold: 60
+            periodSeconds: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            periodSeconds: 10
+---
+#Begin: Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-mariadb-service
+spec:
+  selector:
+    app: my-mariadb
+  ports:
+    - name: mariadb-proto
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+#End: Service

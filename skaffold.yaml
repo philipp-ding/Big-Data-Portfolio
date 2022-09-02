@@ -1,0 +1,24 @@
+apiVersion: skaffold/v2beta27
+kind: Config
+build:
+  artifacts:
+    - image: my-super-web-app
+      context: frontend
+    - image: spark-app
+      context: spark-app
+deploy:
+  kubectl:
+    manifests:
+      - ./deployment/01-mariadb.yaml
+      - ./deployment/02-memcached-deployment-and-service.yaml
+      - ./deployment/03-app-deployment-skaffold.yaml
+      - ./deployment/04-app-service-and-ingress.yaml
+portForward:
+- resourceType: service
+  resourceName: my-super-app-service
+  port: 8080
+  localPort: 9000
+- resourceType: service
+  resourceName: my-app-mariadb-service
+  port: 3306
+  localPort: 3306
