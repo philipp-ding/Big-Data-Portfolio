@@ -1,5 +1,5 @@
-# Entwurf / der App / Frontend
+# Entwurf der Anwendung
 
-![Alt text](/working/Anwendung_Startseite.jpg?raw=true 'Startseite der App')
+![Startseite der App](/working/Anwendung_Startseite.jpg?raw=true 'Startseite der App')
 
-![Alt text](working/working/Anwedung_zweite_Seite.jpg?raw=true 'Genre Beschreibung auf Seite 2')
+![Zweite Seite der App](/working/Anwedung_zweite_Seite.jpg?raw=true 'Genre Beschreibung auf Seite 2')
