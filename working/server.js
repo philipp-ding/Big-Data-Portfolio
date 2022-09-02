@@ -53,21 +53,20 @@ async function getFromCache(key) {
 	return await memcached.get(key);
 }
 
-
+// get Genre data from Database
 async function getFromDatabase_genre() {
 	let connection
-	let query = 'SELECT genre from genres';
+	let query = 'SELECT genre from genres'; // query to select genre from genres
 
 	try {
 		connection = await pool.getConnection()
 		console.log("Executing query " + query)
-		let res = await connection.query(query, [])
-		console.log(res)
+		let res = await connection.query(query, []) // execute query
+		console.log(res) // show result of query
 
 		if (res) {
 			console.log("Query result = ", res)
-			console.log("Query result undefined res = ", res)
-			return res
+			return res // return result of query
 		} else {
 			return null;
 		}
@@ -86,12 +85,12 @@ async function getFromDatabase_popular_genre() {
 	try {
 		connection = await pool.getConnection()
 		console.log("Executing query " + query)
-		let res = await connection.query(query, [])
-		console.log(res)
+		let res = await connection.query(query, [])  // execute query
+		console.log(res) // show result of query
 
 		if (res) {
 			console.log("Query result = ", res)
-			return res
+			return res // return result of query
 		} else {
 			return null;
 		}
@@ -107,21 +106,21 @@ data
 
 
 
-
+// get description of a genre from database
 async function getFromDatabase_genre_description(userid) {
 	let connection
-	let query = 'SELECT * from genres where genre  = ?' ;
+	let query = 'SELECT * from genres where genre  = ?' ; // get a specific genre if meets condition
 
 	try {
 		connection = await pool.getConnection()
 		console.log("Executing query " + query)
 		let res = await connection.query(query, [userid])
-		let row = res[0]
+		let row = res[0] // get the first result of query
 		console.log(res)
 
 		if (row) {
 			console.log("Query result = ", row)
-			return row["description"];
+			return row["description"]; // returns description of genre
 		} else {
 			return null;
 		}
@@ -219,17 +218,17 @@ function send_response_genre(response,userid, data) {
 }
 
 
-
+// startpage
 app.get('/',  async function (request, response) {
 	Promise.all([getFromDatabase_genre(),getFromDatabase_popular_genre()]).then(values => {
 		const genres = values[0]
 		const popular = values[1]
 
 	const genre_html = genres.map(m => `<a href='/genre/${m.genre}' style="color: #1DB954;">${m.genre}</a>`)
-			.join(", ")
+			.join(", ") // links of genres
 	const popularHtml = popular
 			.map(pop => `<li> <a href='/genre/${pop.genre}' style="color: #1DB954;">${pop.genre}</a> (${pop.count} views) </li>`)
-			.join("\n")
+			.join("\n") // list elements with Genre titles
 	const html = `
 			<h2>Top 10 Genres</h2>
 			<p>
@@ -242,9 +241,9 @@ app.get('/',  async function (request, response) {
 		});
 })
 
-// Get data about a specific genre & a description
+// Page bout a specific genre & a description
 app.getAsync('/genre/:id', async function (request, response) {
-	let userid = request.params["id"]
+	let userid = request.params["id"] // saves parameter of id in userid
 	let key =  userid
 	let cachedata = await getFromCache(key)
 
