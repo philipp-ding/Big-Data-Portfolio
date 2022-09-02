@@ -51,7 +51,7 @@ spec:
             name: mariadb-deployment-init-configmap
       containers:
         - name: my-mariadb
-          image: mariadb
+          image: mariadb:10.7.4
           volumeMounts:
             - name: init-volume
               mountPath: /docker-entrypoint-initdb.d/
