@@ -23,7 +23,7 @@ portForward:
   resourceName: my-super-app-service
   port: 8080
   localPort: 8080
-- resourceType: service
-  resourceName: my-app-mariadb-service
-  port: 3306
-  localPort: 3306
+# - resourceType: service
+#   resourceName: my-app-mariadb-service
+#   port: 3306
+#   localPort: 3306

@@ -70,7 +70,7 @@ query = wordCounts.writeStream.outputMode("complete") \
 def databaseconnection(batchDataframe, batchId):
     def save_to_db(iterator):
         dbconnection = mysql.connector.connect(
-            host="localhost",
+            host="10.98.142.149",
             port=3306,
             database='sportsdb',
             user="root",

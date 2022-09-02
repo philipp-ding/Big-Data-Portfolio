@@ -7,4 +7,4 @@ COPY --from=py3 / /
 ARG PYSPARK_VERSION=3.2.0
 ADD . /spark-app
 RUN pip install tweepy && pip install --no-cache-dir pyspark==${PYSPARK_VERSION} && pip install --no-cache-dir mysql-connector-python
-CMD python spark-app/spark_stream_.py
+CMD python spark-app/spark-app.py
