@@ -5,9 +5,9 @@ build:
     - image: my-super-web-app
       docker:
         dockerfile: frontend/Dockerfile
-    - image: spark-app
-      docker:
-        dockerfile: spark-app/Dockerfile
+    # - image: spark-app
+    #   docker:
+    #     dockerfile: spark-app/Dockerfile
   local:
     useBuildkit: true
     push: false 

@@ -1,30 +1,11 @@
 # creator
-import json
-import socket
 import socketserver
-import sys
 import threading
 import time
-
 import mysql.connector
 import tweepy
-from pyspark import SparkContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import desc, explode, regexp_extract, split
-from pyspark.streaming import StreamingContext
-from tweepy import OAuthHandler  # to authenticate Twitter API
-from tweepy import Stream
-
-# Twitter developer Credentials to connect to twitter account
-# access_token = "TJ5yMVqMi5bb9mTTvfGWYpuuG"
-# access_secret = "hiwyl27xXGUz5IB1MKVOW78WmvW0MmJ02idTaLzPc9N3pRawLk"
-# consumer_key = "3154565879-0nE46vwnEMQ55KUCEXRNeZWlMd06IXYfXVIYpLv"
-# consumer_secret = "zOgVGCXi3Xoho2lM3XtprtbiZ3N5D7pN0192zpFleYLxv"
-# Access_Token = "3154565879-0nE46vwnEMQ55KUCEXRNeZWlMd06IXYfXVIYpLv" # public access token of the app
-# Access_Token_Secret = "zOgVGCXi3Xoho2lM3XtprtbiZ3N5D7pN0192zpFleYLxv" # private access token of the app
-# app_name = "dhwbbigdataproject" # name of the app on the twitter developer platform
-# API_Key = "TJ5yMVqMi5bb9mTTvfGWYpuuG" # public api key of the app
-# API_Key_Secret = "hiwyl27xXGUz5IB1MKVOW78WmvW0MmJ02idTaLzPc9N3pRawLk"  # private api key of the app
+from pyspark.sql.functions import explode, split
 
 
 def sendData():

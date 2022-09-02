@@ -87,10 +87,8 @@ async function getFromDatabase_popular_genre() {
     connection = await pool.getConnection();
     console.log("Executing query " + query);
     let res = await connection.query(query, []); // execute query
-    console.log(res); // show result of query
-
     if (res) {
-      console.log("Query result = ", res);
+      console.log("Query result = ", res); // show result of query
       return res; // return result of query
     } else {
       return null;
@@ -114,7 +112,8 @@ async function getFromDatabase_genre_description(userid) {
     console.log(res);
 
     if (row) {
-      console.log("Query result = ", row);
+      console.log("Query executed successfully");
+      // console.log("Query result = ", row);
       return row["description"]; // returns description of genre
     } else {
       return null;
