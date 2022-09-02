@@ -3,9 +3,14 @@ kind: Config
 build:
   artifacts:
     - image: my-super-web-app
-      context: frontend
+      docker:
+        dockerfile: frontend/Dockerfile
     - image: spark-app
-      context: spark-app
+      docker:
+        dockerfile: spark-app/Dockerfile
+  local:
+    useBuildkit: true
+    push: false 
 deploy:
   kubectl:
     manifests:
@@ -17,7 +22,7 @@ portForward:
 - resourceType: service
   resourceName: my-super-app-service
   port: 8080
-  localPort: 9000
+  localPort: 8080
 - resourceType: service
   resourceName: my-app-mariadb-service
   port: 3306
