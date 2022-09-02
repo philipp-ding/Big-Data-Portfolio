@@ -6,20 +6,20 @@
 ## Grundsätzliche Idee der Anwendung: 
 Die Grundlegende Idee der Anwendung war es eine Website zu bauen, die Tweets beschafft um daraus dann verschiedene Musik Genres herauszufiltern. Diese Tweets sollten dann je nach Genre gezählt werden, um herauszufinden, welches Genre am häufigsten in den Tweets erwähnt wird. Das Ergebnis dieser Zählung wird schließlich als Ranking auf der Startseite der Webanwendung angezeigt, wo sowohl die besten zehn Genres geordnet als auch alle anderen Genres abgefragt werden können. Sobald ein Genre aufgerufen wird, wird der Nutzer der Anwendung auf eine zweite Seite weitergeleitet. Dort ist dann eine kurze Beschreibung des Genre zu finden sowie generelle Informationen zur Seite. Die Gruppe entschloss sich für diese Idee aufgrund der Tatsache, dass festgestellt wurde, dass alle Gruppenmitglieder zwar eine Vorliebe für Musik, aber durchaus für verschiedene Genres teilen, weshalb auch das Enddesign des Frontends eine Homage an Spotify ist.
 
-##Architektur:
-###Load Balancer: 
+## Architektur:
+### Load Balancer: 
 Zur Verteilung des Datenverkers nutzen wir Kubernetes Ingress. Damit kann man einfach Regeln für den Datenverkehr festlegen und um hohe auf den Webserver zukommende Lasten abzufangen und auf mehrere Server zu verteilen.
-###Web Servers: 
+### Web Servers: 
 Als Web Server nutzen wir Node.js. Dort haben wir in App.js eine Website abgelegt um die Ergebnisse der Berechnungen der Spark-app anzeigen zu können. Außerdem finden sich dort weitere Infos über die verschiedenen Genres.
-###Cache Servers: 
+### Cache Servers: 
 Für die Cache Servers nutzen wir Memcached. Damit kann man Daten aus der Berechnung einfach hinterlegen und dann schneller laden, da sie einfach aus dem Arbeitsspeicher abgeholt werden.
-###Database Server: 
+### Database Server: 
 Den Database Server stellt bei uns eine MariaDB. MariaDB ist ein relationales Datenbankmanagementsystem welches aus einer Abspaltung von MySQL entstanden ist. Hier werden bei uns die Ergebnisse der Berechnung der Spark-App gespeichert, um sie für den Webserver verfügbar zu machen.
-###Big Data (Science) Processing: 
+### Big Data (Science) Processing: 
 Das Big Data Processing findet in der Spark-App statt. Hierbei werden die Tweets aus einem TCP Stream gelesen und dann weiterverarbeitet. Während der Weiterverarbeitung werden die Tweets in einzelne Wörter aufgespalten und die Leerzeichen gelöscht. Anschließend wird gezählt, welches Wort wie oft vorkommt und mit dieser Zahl zusammen in der Datenbank abgespeichert. Wichtig ist dabei zu sagen, dass nur die Wörter, die in der Genre Liste vorkommen in der MariaDB gespeichert werden, da nur diese relevant für unseren Use Case sind.
-###Big Data Messaging: 
+### Big Data Messaging: 
 Der TCP Server ist für die Weiterleitung des Streams von der Twitter API an die Spark-App verantwortlich. Um die Tweets von Twitter zu streamen wird die Bibliothek Tweepy genutzt. Tweepy ist eine Python Bibliothek die für den Austausch mit der Twitter API genutzt werden kann und in diesem Fall einen Tweet-Stream öffnet. Dieser Stream wird dann vom TCP Server weitergeleitet. Durch den TCP Server stellen wir sicher, dass alle Daten ankommen, da TCP ein verbindungsorientiertes Protokoll ist. Dabei kommen alle Daten genau einmal an.
-###Data Lake: 
+### Data Lake: 
 Durch die Twitter API haben wir Zugriff auf alle Tweets von Twitter. Deshalb haben wir auf einen eigenen Data Lake verzichtet, da wir sonst die Tweets erst in den Data Lake streamen müssten und dann nochmal in die Spark-App streamen würden und dann in die Spark-App. Durch die Umleitung über den TCP Server sparen wir uns einen dieser Streams.
 
 ## Entwurf der Anwendung
