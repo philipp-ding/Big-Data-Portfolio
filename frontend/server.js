@@ -231,7 +231,7 @@ app.get("/", async function (request, response) {
   );
 });
 
-// Page bout a specific genre & a description
+// Page about a specific genre & a description
 app.getAsync("/genre/:id", async function (request, response) {
   let userid = request.params["id"]; // saves parameter of id in userid
   let key = userid;
